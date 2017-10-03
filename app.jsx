@@ -63,10 +63,15 @@ class Model {
       this.inform();
   }
 
-  quitarPunto(index) {
+  subtractPoint(index) {
     this.PLAYERS[index].score-- ;
     this.notify();
- };
+ }
+
+  addPoint(index) {
+    this.PLAYERS[index].score++ ;
+    this.notify();
+  }
 }
 
 const Header = props => {
@@ -105,9 +110,9 @@ function divList(list, model){
             <div className="player">
               <div className="player-name">{value.name}</div>
               <div className="player-score counter">
-                <div onClick = {()=>model.quitarPunto(position)} className="counter-action decrement">-</div>
+                <div onClick = {()=>model.subtractPoint(position)} className="counter-action decrement">-</div>
                 <div className="counter-score">{value.score}</div>
-                <div className="counter-action increment">+</div>
+                <div onClick = {()=>model.addPoint(position)} className="counter-action increment">+</div>
               </div>
             </div>
           </div>
