@@ -1,59 +1,70 @@
 class Model {
-  constructor () {
-    this.PLAYERS = [
-      {
-        name: "Jim Hoskins",
-        score: 31,
-        id: 1,
-      },
+    constructor(){
+      this.PLAYERS = [
         {
-        name: "Andree Hoskins",
-        score: 35,
-        id: 2,
-      },
-        {
-        name: "Alena Hoskins",
-        score: 42,
-        id: 3,
-      },
-    ];
-    this.inputValue = null;
+          name: "Jim Hoskins",
+          score: 31,
+          id: 1,
+        },
+         {
+          name: "Andree Hoskins",
+          score: 35,
+          id: 2,
+        },
+         {
+          name: "Alena Hoskins",
+          score: 42,
+          id: 3,
+        },
+      ];
     this.todos = [];
-    this.render = undefined;
-  }
+    this.inputValue = null;
+    this.callback = null;
+    this.index = 0;
+    };
 
   subscribe(render) {
-    this.render = render;
+    this.callback = render;
   }
-  
+   
+  notify() {
+    this.callback();
+  }
+
   inform() {
     console.log(this.todos.map(e => e.text));
     this.render();
   }
 
-  onScoreChange (index, delta) {
-    this.state.players[index].score += delta;
-    this.setState(this.state);
-  }
-
-  updateTodo (index, todo) {
-    this.todos[index] = todo;
+  addPlayer(text) {
+    this.todos.push({ 
+        name: name, 
+        score: 0 
+    });
     this.inform();
   }
-
-  onAddPlayer (name) {
-    this.state.players.push({ name: name, score: 0 });
-    this.setState(this.state);
+  
+  addTodo(text) {
+      this.todos.push({
+         id: Utils.uuid(),
+         text: text,
+         completed: false
+      });
+      this.inform();
   }
-
-  onRemovePlayer (index) {
-    this.state.players.splice(index, 1);
-    this.setState(this.state);
-  },
+  
+  updateTodo(index, todo) {
+      this.todos[index] = todo;
+      this.inform();
+  }
+  
+  removeTodo(todo) {
+      this.todos = this.todos.filter(item => item !== todo);
+      this.inform();
+  }
 }
 
-
-const Header = ({model}) => {
+const Header = props => {
   return(
     <div className="header">
     <table>
@@ -80,20 +91,19 @@ const Header = ({model}) => {
 function divList(list){
   return(
     list.map((value, position) =>{
-      const add = (e) =>  {
+      const onOptionSelect = (e) =>  {
         console.log('value: ', option);
-        model.addTodo(text);
+        model.addPlayer(option, index);
      };
-  
       return(
         <div>
           <div key={position}>
             <div className="player">
               <div className="player-name">{value.name}</div>
               <div className="player-score counter">
-                <button onClick = {add} className="counter-action decrement">-</button>
+                <div onClick = {onOptionSelect} className="counter-action decrement">-</div>
                 <div className="counter-score">{value.score}</div>
-                <button className="counter-action increment">+</button>
+                <div className="counter-action increment">+</div>
               </div>
             </div>
           </div>
@@ -114,18 +124,8 @@ const PlayerList = props => {
 const PlayerForm = props => {
   return(
     <div className="add-player-form">
-      <form action=""
-        onSubmit={e => {
-            e.preventDefault();
-            model.addTodo(model.inputValue);
-        }}
-      >
-        <input 
-           onChange={e => (model.inputValue = e.target.value)} 
-           type="text" 
-           placeholder="Enter a name"
-           value =
-           ></input>
+      <form action="">
+        <input type="text" placeholder="Enter a name"></input>
         <input type="submit" value="ADD PLAYER"></input>
       </form>
     </div>
@@ -143,6 +143,6 @@ const Application = ({title, players}) => {
 }
 
 let model = new Model();
-let counter = 1;
-
-ReactDOM.render(<Application title="Scoreboard" players = {PLAYERS}/>, document.getElementById('container'));
+ReactDOM.render(<Application title="Scoreboard" players = {model.PLAYERS}/>, document.getElementById('container'));
+model.subscribe(render);
+render();
