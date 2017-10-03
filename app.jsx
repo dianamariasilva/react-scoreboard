@@ -65,6 +65,9 @@ class Model {
 }
 
 const Header = props => {
+  const totalPoints = props.players.reduce(function(total, player) {
+    return total + player.score;
+  }, 0);
   return(
     <div className="header">
     <table>
@@ -72,7 +75,7 @@ const Header = props => {
       <tr>
         <td>
           <p>PLAYERS:{props.players.length}</p>
-          <p>TOTAL POINTS: {props.score}</p>
+          <p>TOTAL POINTS: {totalPoints}</p>
         </td>
       </tr>
       </tbody>
@@ -89,12 +92,12 @@ const Header = props => {
 }
 
 function divList(list){
+  const onOptionSelect = (e) =>  {
+    console.log('value: ', option);
+    model.addPlayer(option, index);
+ };
   return(
     list.map((value, position) =>{
-      const onOptionSelect = (e) =>  {
-        console.log('value: ', option);
-        model.addPlayer(option, index);
-     };
       return(
         <div>
           <div key={position}>
