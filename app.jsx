@@ -1,22 +1,59 @@
-let PLAYERS = [
-  {
-    name: "Jim Hoskins",
-    score: 31,
-    id: 1,
-  },
-   {
-    name: "Andree Hoskins",
-    score: 35,
-    id: 2,
-  },
-   {
-    name: "Alena Hoskins",
-    score: 42,
-    id: 3,
-  },
-];
+class Model {
+  constructor () {
+    this.PLAYERS = [
+      {
+        name: "Jim Hoskins",
+        score: 31,
+        id: 1,
+      },
+        {
+        name: "Andree Hoskins",
+        score: 35,
+        id: 2,
+      },
+        {
+        name: "Alena Hoskins",
+        score: 42,
+        id: 3,
+      },
+    ];
+    this.inputValue = null;
+    this.todos = [];
+    this.render = undefined;
+  }
 
-const Header = props => {
+  subscribe(render) {
+    this.render = render;
+  }
+  
+  inform() {
+    console.log(this.todos.map(e => e.text));
+    this.render();
+  }
+
+  onScoreChange (index, delta) {
+    this.state.players[index].score += delta;
+    this.setState(this.state);
+  }
+
+  updateTodo (index, todo) {
+    this.todos[index] = todo;
+    this.inform();
+  }
+
+  onAddPlayer (name) {
+    this.state.players.push({ name: name, score: 0 });
+    this.setState(this.state);
+  }
+
+  onRemovePlayer (index) {
+    this.state.players.splice(index, 1);
+    this.setState(this.state);
+  },
+}
+
+
+const Header = ({model}) => {
   return(
     <div className="header">
     <table>
@@ -43,15 +80,20 @@ const Header = props => {
 function divList(list){
   return(
     list.map((value, position) =>{
+      const add = (e) =>  {
+        console.log('value: ', option);
+        model.addTodo(text);
+     };
+  
       return(
         <div>
           <div key={position}>
             <div className="player">
               <div className="player-name">{value.name}</div>
               <div className="player-score counter">
-                <div className="counter-action decrement">-</div>
+                <button onClick = {add} className="counter-action decrement">-</button>
                 <div className="counter-score">{value.score}</div>
-                <div className="counter-action increment">+</div>
+                <button className="counter-action increment">+</button>
               </div>
             </div>
           </div>
@@ -72,8 +114,18 @@ const PlayerList = props => {
 const PlayerForm = props => {
   return(
     <div className="add-player-form">
-      <form action="">
-        <input type="text" placeholder="Enter a name"></input>
+      <form action=""
+        onSubmit={e => {
+            e.preventDefault();
+            model.addTodo(model.inputValue);
+        }}
+      >
+        <input 
+           onChange={e => (model.inputValue = e.target.value)} 
+           type="text" 
+           placeholder="Enter a name"
+           value =
+           ></input>
         <input type="submit" value="ADD PLAYER"></input>
       </form>
     </div>
@@ -89,5 +141,8 @@ const Application = ({title, players}) => {
       </div>      
    ) ;
 }
+
+let model = new Model();
+let counter = 1;
 
 ReactDOM.render(<Application title="Scoreboard" players = {PLAYERS}/>, document.getElementById('container'));
