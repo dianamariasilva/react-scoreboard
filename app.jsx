@@ -50,18 +50,23 @@ class Model {
          text: text,
          completed: false
       });
-      this.inform();
+      this.notify();
   }
   
   updateTodo(index, todo) {
       this.todos[index] = todo;
-      this.inform();
+      this.notify();
   }
   
   removeTodo(todo) {
       this.todos = this.todos.filter(item => item !== todo);
       this.inform();
   }
+
+  quitarPunto(index) {
+    this.PLAYERS[index].score-- ;
+    this.notify();
+ };
 }
 
 const Header = props => {
@@ -91,11 +96,7 @@ const Header = props => {
   )
 }
 
-function divList(list){
-  const onOptionSelect = (e) =>  {
-    console.log('value: ', option);
-    model.addPlayer(option, index);
- };
+function divList(list, model){
   return(
     list.map((value, position) =>{
       return(
@@ -104,7 +105,7 @@ function divList(list){
             <div className="player">
               <div className="player-name">{value.name}</div>
               <div className="player-score counter">
-                <div onClick = {onOptionSelect} className="counter-action decrement">-</div>
+                <div onClick = {()=>model.quitarPunto(position)} className="counter-action decrement">-</div>
                 <div className="counter-score">{value.score}</div>
                 <div className="counter-action increment">+</div>
               </div>
@@ -119,7 +120,7 @@ function divList(list){
 const PlayerList = props => {
   return(
     <div>  
-      {divList(props.players)}
+      {divList(props.players,props.model)}
     </div>
   )
 }
@@ -135,17 +136,23 @@ const PlayerForm = props => {
   )
 }
 
-const Application = ({title, players}) => {
+const Application = ({title,model}) => {
    return (
      <div className ="scoreboard">
-      <Header className="header" players={players}/>
-      <PlayerList className="stats" players={players}/>
+      <Header className="header" players={model.PLAYERS}/>
+      <PlayerList className="stats" players={model.PLAYERS} model={model}/>
       <PlayerForm />
       </div>      
    ) ;
 }
 
+
 let model = new Model();
-ReactDOM.render(<Application title="Scoreboard" players = {model.PLAYERS}/>, document.getElementById('container'));
+let render = () => {
+  ReactDOM.render(
+     <Application title="TodoApp" model={model} />,
+     document.getElementById('container')
+  );
+};
 model.subscribe(render);
 render();
