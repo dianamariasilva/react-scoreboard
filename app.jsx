@@ -1,22 +1,83 @@
-let PLAYERS = [
-  {
-    name: "Jim Hoskins",
-    score: 31,
-    id: 1,
-  },
-   {
-    name: "Andree Hoskins",
-    score: 35,
-    id: 2,
-  },
-   {
-    name: "Alena Hoskins",
-    score: 42,
-    id: 3,
-  },
-];
+class Model {
+    constructor(){
+      this.PLAYERS = [
+        {
+          name: "Jim Hoskins",
+          score: 31,
+          id: 1,
+        },
+         {
+          name: "Andree Hoskins",
+          score: 35,
+          id: 2,
+        },
+         {
+          name: "Alena Hoskins",
+          score: 42,
+          id: 3,
+        },
+      ];
+    this.todos = [];
+    this.inputValue = null;
+    this.callback = null;
+    this.index = 0;
+    };
+
+  subscribe(render) {
+    this.callback = render;
+  }
+   
+  notify() {
+    this.callback();
+  }
+
+  inform() {
+    console.log(this.todos.map(e => e.text));
+    this.render();
+  }
+
+  addPlayer(text) {
+    this.todos.push({ 
+        name: name, 
+        score: 0 
+    });
+    this.inform();
+  }
+  
+  addTodo(text) {
+      this.todos.push({
+         id: Utils.uuid(),
+         text: text,
+         completed: false
+      });
+      this.notify();
+  }
+  
+  updateTodo(index, todo) {
+      this.todos[index] = todo;
+      this.notify();
+  }
+  
+  removeTodo(todo) {
+      this.todos = this.todos.filter(item => item !== todo);
+      this.inform();
+  }
+
+  subtractPoint(index) {
+    this.PLAYERS[index].score-- ;
+    this.notify();
+ }
+
+  addPoint(index) {
+    this.PLAYERS[index].score++ ;
+    this.notify();
+  }
+}
 
 const Header = props => {
+  const totalPoints = props.players.reduce(function(total, player) {
+    return total + player.score;
+  }, 0);
   return(
     <div className="header">
     <table>
@@ -24,7 +85,7 @@ const Header = props => {
       <tr>
         <td>
           <p>PLAYERS:{props.players.length}</p>
-          <p>TOTAL POINTS: {props.score}</p>
+          <p>TOTAL POINTS: {totalPoints}</p>
         </td>
       </tr>
       </tbody>
@@ -40,7 +101,7 @@ const Header = props => {
   )
 }
 
-function divList(list){
+function divList(list, model){
   return(
     list.map((value, position) =>{
       return(
@@ -49,9 +110,9 @@ function divList(list){
             <div className="player">
               <div className="player-name">{value.name}</div>
               <div className="player-score counter">
-                <div className="counter-action decrement">-</div>
+                <div onClick = {()=>model.subtractPoint(position)} className="counter-action decrement">-</div>
                 <div className="counter-score">{value.score}</div>
-                <div className="counter-action increment">+</div>
+                <div onClick = {()=>model.addPoint(position)} className="counter-action increment">+</div>
               </div>
             </div>
           </div>
@@ -64,7 +125,7 @@ function divList(list){
 const PlayerList = props => {
   return(
     <div>  
-      {divList(props.players)}
+      {divList(props.players,props.model)}
     </div>
   )
 }
@@ -80,14 +141,23 @@ const PlayerForm = props => {
   )
 }
 
-const Application = ({title, players}) => {
+const Application = ({title,model}) => {
    return (
      <div className ="scoreboard">
-      <Header className="header" players={players}/>
-      <PlayerList className="stats" players={players}/>
+      <Header className="header" players={model.PLAYERS}/>
+      <PlayerList className="stats" players={model.PLAYERS} model={model}/>
       <PlayerForm />
       </div>      
    ) ;
 }
 
-ReactDOM.render(<Application title="Scoreboard" players = {PLAYERS}/>, document.getElementById('container'));
+
+let model = new Model();
+let render = () => {
+  ReactDOM.render(
+     <Application title="TodoApp" model={model} />,
+     document.getElementById('container')
+  );
+};
+model.subscribe(render);
+render();
